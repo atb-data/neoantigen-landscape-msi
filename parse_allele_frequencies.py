@@ -34,4 +34,5 @@ def load_and_dump(path, output):
 
 if __name__ == "__main__":
   import sys
-  load_and_dump(sys.argv[1], sys.argv[1] + ".csv")
+  if sys.argv[1].endswith(".html"):
+    load_and_dump(sys.argv[1], sys.argv[1] + ".csv")

@@ -229,7 +229,7 @@ if __name__ == "__main__":
 
   # Eval:
   if DO_SORT:
-    data_full = unique_count.read_data(Path("table_dump.csv"), delimiter=";")
+    data_full = unique_count.read_data(Path("table_dump_colon.csv"), delimiter=";")
     data_full = data_full.sort_values(["GEDS: 50 %"], ascending=False)
     data_wanted = data_full[data_full["strength"] == "weak"]
     data_wanted.to_csv("table_sorted_strong_GEDS.csv")

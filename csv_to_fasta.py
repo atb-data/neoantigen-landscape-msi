@@ -132,7 +132,7 @@ class NetMHCpan(object):
     self.input = input
     self.alleles = alleles
     self.home = "$NETMHCpan"
-    self.syn = "$NetMHCpan/data/synlist.bin"
+    self.syn = "$NETMHCpan/data/synlist.bin"
     self.tmp = "$TMPDIR/netMHCpan"
     self.pseudo = "$NETMHCpan/data/MHC_pseudo.dat"
     self.seq = None
@@ -222,4 +222,4 @@ def main():
     )
 
 if __name__ == "__main__":
-    main()
+  main()
