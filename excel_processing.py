@@ -8,7 +8,7 @@ def anonymized(tumor_list, prefix="CS"):
   result = {}
   alphabetical = sorted(tumor_list)
   for idx, elem in enumerate(alphabetical):
-    result[f"HD{prefix}{idx:04}"] = elem
+    result[elem] = elem
   return result
 
 def tumor_characteristics(file, anon_output="outfiles/full_anonymization.csv"):
@@ -123,9 +123,81 @@ def read_mutations(file, filter=lambda x: True):
     m2[name + "_m2"] = m2sum
   return m1, m2
 
-def read_mutation_files(file1, file2, method=read_mutations, filter=lambda x: True):
+def read_mutated_mutations(file, filter=lambda x: True):
+  """Percentage of analyzed samples containing m1 frame and m2 frame peptides."""
+  m1 = {}
+  m2 = {}
+  wb = load_workbook(file)
+  for name in wb.sheetnames:
+    sheet = wb[name]
+    m1sum = 0.0
+    count1 = 0
+    for idx in range(1, len(sheet["AH"])):
+      tumor_sample = sheet["A"][idx].value
+      if filter(tumor_sample):
+        val = sheet["AH"][idx].value
+        if val == None:
+          break
+        count1 += 1 if val > 0.0 else 0
+        m1sum += val
+    m2sum = 0.0
+    count2 = 0
+    for idy in range(1, len(sheet["AG"])):
+      tumor_sample = sheet["A"][idy].value
+      if filter(tumor_sample):
+        val = sheet["AG"][idy].value
+        if val == None:
+          break
+        count2 += 1 if val > 0.0 else 0
+        m2sum += val
+    if count1 == 0:
+      m1sum = 0.0
+    else:
+      m1sum /= count1
+
+    if count2 == 0:
+      m2sum = 0.0
+    else:
+      m2sum /= count2
+    m1[name + "_m1"] = m1sum
+    m2[name + "_m2"] = m2sum
+  return m1, m2
+
+def read_tumor_mutations(file, filter=lambda x: True):
+  m1 = {}
+  m2 = {}
+  wb = load_workbook(file)
+  for name in wb.sheetnames:
+    m1[name + "_m1"] = {}
+    m2[name + "_m2"] = {}
+    sheet = wb[name]
+    count1 = 0
+    for idx in range(1, len(sheet["AH"])):
+      tumor_sample = sheet["A"][idx].value
+      if filter(tumor_sample):
+        val = sheet["AH"][idx].value
+        if val == None:
+          break
+        count1 += 1
+        m1[name + "_m1"][tumor_sample] = val
+    count2 = 0
+    for idy in range(1, len(sheet["AG"])):
+      tumor_sample = sheet["A"][idy].value
+      if filter(tumor_sample):
+        val = sheet["AG"][idy].value
+        if val == None:
+          break
+        count2 += 1
+        m2[name + "_m2"][tumor_sample] = val
+  return m1, m2
+
+def read_mutation_files(*files, method=read_mutations, filter=lambda x: True):
   """Reads mutation rates from files for m1 and m2 mutations."""
-  f1 = method(file1, filter=filter)
-  f2 = method(file2, filter=filter)
-  result = {**f1[0], **f2[0], **f1[1], **f2[1]}
+  fs = [
+    method(f, filter=filter)
+    for f in files
+  ]
+  result = {}
+  for f in fs:
+    result.update({**f[0], **f[1]})
   return result

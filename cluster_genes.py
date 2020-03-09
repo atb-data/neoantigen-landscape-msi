@@ -18,6 +18,8 @@ def read_raw_tumor_data(path):
   wb = load_workbook(path)
   by_gene = {}
   for sheet in wb.sheetnames:
+    if sheet == "Gesamttabelle":
+      continue
     by_tumor = {}
     first = True
     for row in wb[sheet].rows:
@@ -354,7 +356,7 @@ def perform_analysis(data, analysis):
 
 def analyse(data, analysis_list):
   result = {}
-  for tumor_type in data:
+  for tumor_type in ["crc", "ec"]:
     result[tumor_type] = {}
     for data_view in data[tumor_type]:
       result[tumor_type][data_view] = {}
@@ -559,6 +561,8 @@ if __name__ == "__main__":
   for tumor_type in cluster_result:
     for data_view in cluster_result[tumor_type]:
       for feature_set in cluster_result[tumor_type][data_view]:
+        if feature_set.startswith("fhb"):
+          continue
         for analysis in cluster_result[tumor_type][data_view][feature_set]:
           clustering_result = cluster_result[tumor_type][data_view][feature_set][analysis]
           pcas = pca_result[tumor_type][data_view][feature_set]

@@ -70,11 +70,13 @@ def parse_endometrium_complete(csv_path):
     header = next(csv_file)
     for line in csv_file:
       fields = line.split(";")
+      if not fields[0]:
+        continue
       tumor_id = fields[0]
       candidate = fields[1]
       m2 = float(fields[32])
       m1 = float(fields[33])
-      wt = float(fields[34])
+      wt = 1 - m1 - m2
       if not (tumor_id in data):
         data[tumor_id] = {}
       data[tumor_id][candidate] = {
@@ -132,7 +134,7 @@ def parse_csv(csv_path, delimiter=",", force=None, nancount_rows=10, nancount_co
         if np.isnan(data[sample][idx]):
           nancounts[idx] += 1
     above_threshold = [idx for idx, count in enumerate(nancounts) if count > nancount_cols]
-    candidates = [elem for idx, elem in enumerate(header[21:]) if (not idx in above_threshold) or elem in force]
+    candidates = [elem for idx, elem in enumerate(header[21:]) if ((not idx in above_threshold) or elem in force) and elem != "CLOCK"]
     for sample in data.keys():
       row = []
       for idx in range(len(data[sample])):
@@ -156,6 +158,16 @@ def rename_to_hugo(candidate, renamings):
     result = "RNF43.C6"
   if result == "RNF43.A3":
     result = "RNF43.G7"
+  if result == "RNF43_C6":
+    result = "RNF43.C6"
+  if result == "RNF43_G7":
+    result = "RNF43.G7"
+  if result == "RNF43-2":
+    result = "RNF43.C6"
+  if result == "RNF43-3":
+    result = "RNF43.G7"
+  if result == "TGRFB":
+    result = "TGFBR2"
   return result
 
 def plot_data(data, endodata, cmap_code="seismic", x_label="candidate peptides",
@@ -323,14 +335,15 @@ if __name__ == "__main__":
                    nancount_cols=20)
   endometrium = parse_endometrium_complete(Path("testfiles/ECQMR.csv"))
   for idx, key in enumerate(endometrium[1]):
-    if key.endswith(".C6"):
+    if key.endswith("_C6"):
       endometrium[1][idx] = "A2"
-    if key.endswith(".G7"):
+    if key.endswith("_G7"):
       endometrium[1][idx] = "A3"
+    if key == "TGRFB":
+      endometrium[1][idx] = "TGFBR2"
 
   if int(sys.argv[1]):
-    data_full = parse_csv(Path("testfiles/CRCQMR.csv"), nancount_rows=1000, nancount_cols=1000, delimiter=";")
+    data_full = parse_csv(Path("testfiles/CRCQMR.csv"), nancount_rows=41, nancount_cols=1000, delimiter=";")
     plot_data(data_full, endometrium, cmap_code="Blues", output="outputimages/SupFig2.svg", mutsort=False)
   else:
     plot_data(data, endometrium, cmap_code="Blues", output="outputimages/Fig1.svg", mutsort=True)
-
