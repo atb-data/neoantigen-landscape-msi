@@ -39,3 +39,7 @@ python heatmap_huge_csv.py 1
 
 # Generate scatter plot for Sup.Fig. 5:
 python bias_test.py
+
+# Generate HLA-A*02:01 results:
+python hla0201.py
+
