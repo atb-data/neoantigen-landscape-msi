@@ -19,7 +19,7 @@ an `in` directory containing the input data for each marker and an `out` directo
 ### Definitions
 |Name|Definition|
 |----|----------|
-| MP | main peak - the peak of the expected fragment length (K)|
+| MP | main peak - the peak of the expected fragment length (K). Usually the highest peak in a non-mutated reference sample|
 | LX | minus-X peak - the peak of length K - X|
 | RX | plus-X peak - the peak of length K + X|
 | relative peak height | peak-height / sum of peak-heights|
